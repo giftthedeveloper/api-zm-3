@@ -20,10 +20,12 @@ export class UsersService {
   }
 
   async delete(id: string): Promise<void> {
-    const result = await this.usersModel.deleteOne({ _id: new Types.ObjectId(id) });
+    const result = await this.usersModel.deleteOne({
+      _id: new Types.ObjectId(id),
+    });
 
     if (result.deletedCount === 0) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-}
+  }
 }
