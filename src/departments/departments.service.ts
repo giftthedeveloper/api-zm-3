@@ -15,7 +15,31 @@ export class DepartmentsService {
     return createdDepartment.save();
   }
 
+  // async findAll(): Promise<Departments[]> {
+  //   return this.departmentsModel.find().exec();
+  // }
+
   async findAll(): Promise<Departments[]> {
-    return this.departmentsModel.find().exec();
+    return this.departmentsModel
+      .aggregate([
+        {
+          $facet: {
+            prioritized: [{ $match: { name: 'None' } }],
+            others: [{ $match: { name: { $ne: 'None' } } }],
+          },
+        },
+        {
+          $project: {
+            departments: { $concatArrays: ['$prioritized', '$others'] },
+          },
+        },
+        {
+          $unwind: '$departments',
+        },
+        {
+          $replaceRoot: { newRoot: '$departments' },
+        },
+      ])
+      .exec();
   }
 }
